@@ -9,6 +9,8 @@
 ## Overview
 You will complete these exercises from the Windows 10 client. RDP into the `client01.training.com` Windows 10 machine using the **RDP/SSH IP** from the lab web page. Use the `student01` credential from the lab setup guide. Where necessary elevate your session using the `administrator` credential.
 
+**For your convenience the PowerShell commands have been saved in script files under `C:\Labs` on the two Windows lab hosts. You can open these in the ISE to run commands without copy/paste from the lab guide.**
+
 If connectivity to the remote lab is not available, then the steps in Lab 01 can be completed from any Windows 10 machine.
 
 ---
@@ -140,7 +142,9 @@ You will find these alerts in the log `Microsoft-Windows-Windows Defender/Operat
     `Get-WinEvent -LogName 'Microsoft-Windows-Windows Defender/Operational' -FilterXPath "*[System[((EventID=1116) or (EventID=1117))]]" -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
 
 > **NOTE** - AMSI has an [EICAR](https://en.wikipedia.org/wiki/EICAR_test_file) equivalent for testing. For safe testing of this feature in the enterprise use the following command:
-`iex 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c1386'`
+`iex 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c138 6'`
+
+> **NOTE** - In order for the AMSI test line to work you must remove the `SPACE` between the last two digits. The space was introduced to keep Defender from alerting on the lab file.
 
 ---
 
@@ -521,4 +525,4 @@ Consider collection and analysis intervals based on the criticality of systems (
 
 End of line.
 
-Now choose which of the remaining labs you want to complete in the time remaining.
+*Now choose which of the remaining labs you want to complete in the time remaining.*

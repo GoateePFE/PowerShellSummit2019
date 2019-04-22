@@ -15,7 +15,7 @@ An internet search will reveal that this topic is both wide and deep, requiring 
 This lab is an entry point on your learning journey.
 Topics covered here are the easiest to implement in your enterprise.**
 
-***TL;DR: If you have not configured PowerShell logging in your entprise, you are mostly blind to common threat actor tactics.***
+***TL;DR: If you have not configured PowerShell logging in your enterprise, you are mostly blind to common threat actor tactics.***
 
 ### Accessing the Lab Guide
 The lab guide and related scripts are hosted on Github here:
@@ -24,6 +24,8 @@ OR
 <https://bit.ly/2ZpwBDe>
 You can read them from Github or clone them to your local machine for use during the lab and future reference.
 If you find a typo in the lab guide, then submit a pull request. ;)
+
+**For your convenience the PowerShell commands have been saved in script files under `C:\Labs` on the two Windows lab hosts. You can open these in the ISE to run commands without copy/paste from the lab guide.**
 
 ### Activating Your Lab Environment
 On the handout provided by your instructor you have a unique URL to your own lab instance hosted in AWS.

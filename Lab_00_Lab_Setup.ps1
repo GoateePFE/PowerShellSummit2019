@@ -1,21 +1,20 @@
 break
 
-# PowerShell and DevOps Global Summit 2019 
+# PowerShell and DevOps Global Summit 2019
 
- # Hands On Lab: Hunting PowerShell Badness 
+# Hands On Lab: Hunting PowerShell Badness
 
- ## Instructor: Ashley McGlone ([@GoateePFE](https://twitter.com/GoateePFE)), Director of Technical Account Management, Tanium 
+## Instructor: Ashley McGlone ([@GoateePFE](https://twitter.com/GoateePFE)), Director of Technical Account Management, Tanium
 
- ### Lab Objective 
+### Lab Objective
 
- ### Accessing the Lab Guide 
+### Accessing the Lab Guide
 
- ### Activating Your Lab Environment 
+### Activating Your Lab Environment
 
- ### Lab Machines 
+### Lab Machines
 
- ### Lab Credentials 
+### Lab Credentials
 
- ### Lab Outline 
-
+### Lab Outline
 

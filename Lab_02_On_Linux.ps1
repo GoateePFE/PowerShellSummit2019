@@ -1,135 +1,134 @@
 break
 
-# Lab 02 - PowerShell Policies in Core 
+# Lab 02 - PowerShell Policies in Core
 
- ## Objective 
+## Objective
 
- ## Background 
+## Background
 
- ## Overview 
+## Overview
 
- ## Exercise 2.1 - Implement logging settings 
+## Exercise 2.1 - Implement logging settings
 
- ### 2.1.1 Get connected 
+### 2.1.1 Get connected
 
- pwsh 
+pwsh
 
- $PSVersionTable 
+$PSVersionTable
 
- ### 2.1.2 PSReadLine 
+### 2.1.2 PSReadLine
 
- Get-Module 
+Get-Module
 
- Get-Command -Module PSReadLine 
+Get-Command -Module PSReadLine
 
- Get-PSReadLineOption - notice the properties MaximumHistoryCount and HistorySavePath 
+Get-PSReadLineOption - notice the properties MaximumHistoryCount and HistorySavePath
 
- ### 2.1.3 PowerShell policies JSON 
+### 2.1.3 PowerShell policies JSON
 
- cd $pshome 
+cd $pshome
 
- dir *.json 
+dir *.json
 
- cat powershell.config.lab.json 
+cat powershell.config.lab.json
 
- #region
-     { 
-         "Microsoft.PowerShell:ExecutionPolicy": "RemoteSigned", 
-         "PowerShellPolicies": { 
-             "ScriptBlockLogging": { 
-             "EnableScriptBlockInvocationLogging": false, 
-             "EnableScriptBlockLogging": true 
-             }, 
-             "ModuleLogging": { 
-             "EnableModuleLogging": false, 
-             "ModuleNames": [ 
-                 "*" 
-             ] 
-             }, 
-             "Transcription": { 
-             "EnableTranscripting": true, 
-             "EnableInvocationHeader": true, 
-             "OutputDirectory": "/var/tmp/pstranscripts/" 
-             } 
-         }, 
-         "LogLevel": "verbose" 
-     } 
- #endregion
+#region
+    {
+        "Microsoft.PowerShell:ExecutionPolicy": "RemoteSigned",
+        "PowerShellPolicies": {
+            "ScriptBlockLogging": {
+            "EnableScriptBlockInvocationLogging": false,
+            "EnableScriptBlockLogging": true
+            },
+            "ModuleLogging": {
+            "EnableModuleLogging": false,
+            "ModuleNames": [
+                "*"
+            ]
+            },
+            "Transcription": {
+            "EnableTranscripting": true,
+            "EnableInvocationHeader": true,
+            "OutputDirectory": "/var/tmp/pstranscripts/"
+            }
+        },
+        "LogLevel": "verbose"
+    }
+#endregion
 
- sudo cp ./powershell.config.lab.json ./powershell.config.json 
+sudo cp ./powershell.config.lab.json ./powershell.config.json
 
- dir *.json 
+dir *.json
 
- ## Exercise 2.2 - Generate PowerShell activity 
+## Exercise 2.2 - Generate PowerShell activity
 
- ### 2.2.1 Generate PowerShell activity 
+### 2.2.1 Generate PowerShell activity
 
- exit 
+exit
 
- pwsh 
+pwsh
 
- "Hello, world." 
+"Hello, world."
 
- $env:PSModulePath 
+$env:PSModulePath
 
- Get-Process | Sort-Object CPU -Descending | Select-Object -First 5 
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5
 
- Test-Connection ts1 
+Test-Connection ts1
 
- exit 
+exit
 
- ## Exercise 2.3 - Find PowerShell activity in the logs 
+## Exercise 2.3 - Find PowerShell activity in the logs
 
- ### 2.3.1 PSReadLine 
+### 2.3.1 PSReadLine
 
- pwsh 
+pwsh
 
- (Get-PSReadLineOption).HistorySavePath 
+(Get-PSReadLineOption).HistorySavePath
 
- cat (Get-PSReadLineOption).HistorySavePath 
+cat (Get-PSReadLineOption).HistorySavePath
 
- /home/user/.local/share/powershell/PSReadLine/ConsoleHost_history.txt 
+/home/user/.local/share/powershell/PSReadLine/ConsoleHost_history.txt
 
- exit 
+exit
 
- cat /home/user/.local/share/powershell/PSReadLine/ConsoleHost_history.txt 
+cat /home/user/.local/share/powershell/PSReadLine/ConsoleHost_history.txt
 
- ### 2.3.2 Script block logging 
+### 2.3.2 Script block logging
 
- cd /var/log 
+cd /var/log
 
- sudo grep powershell messages 
+sudo grep powershell messages
 
- TIMESTAMP MACHINENAME powershell[PID]: (COMMITID:TID:CID) 
+TIMESTAMP MACHINENAME powershell[PID]: (COMMITID:TID:CID)
 
- sudo tail -f messages 
+sudo tail -f messages
 
- pwsh 
+pwsh
 
- Get-Process 
+Get-Process
 
- dir 
+dir
 
- ### 2.3.3 Transcripts 
+### 2.3.3 Transcripts
 
- ls -lR /var/tmp/pstranscripts 
+ls -lR /var/tmp/pstranscripts
 
- cd /var/tmp/pstranscripts 
+cd /var/tmp/pstranscripts
 
- ls 
+ls
 
- cd USE_DATE_DIRECTORY_HERE 
+cd USE_DATE_DIRECTORY_HERE
 
- ls -l 
+ls -l
 
- nano PASTED_TXT_FILE_NAME (Use PgUp/PgDn to view the file and CTRL X to exit.) 
+nano PASTED_TXT_FILE_NAME (Use PgUp/PgDn to view the file and CTRL X to exit.)
 
- cat PASTED_TXT_FILE_NAME 
+cat PASTED_TXT_FILE_NAME
 
- cd /var/tmp/pstranscripts 
+cd /var/tmp/pstranscripts
 
- grep -iR KEYWORD_HERE 
+grep -iR KEYWORD_HERE
 
- ## 2.4 Considerations for PowerShell Core logging 
-
+## 2.4 Considerations for PowerShell Core logging
 

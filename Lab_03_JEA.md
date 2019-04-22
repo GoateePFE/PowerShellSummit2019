@@ -17,6 +17,8 @@ Also, JEA allows you to specify a separate transcription directory dedicated to 
 In the online lab web interface you must click the `View VMs` button under the **Virtual Clients** heading.
 You will use RDP to the **RDP/SSH IP** of the `ts1.training.com` and `client-01.training.com` machines. You will need both RDP sessions open throughout the lab.
 
+**For your convenience the PowerShell commands have been saved in script files under `C:\Labs` on the two Windows lab hosts. You can open these in the ISE to run commands without copy/paste from the lab guide.**
+
 ---
 
 ## Exercise 3.1 - Auditing JEA
