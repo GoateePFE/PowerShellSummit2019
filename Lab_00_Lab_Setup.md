@@ -36,6 +36,7 @@ You will use the **RDP/SSH IP** to connect into the remote lab virtual machines.
 
 ### Lab Machines
 The following computer names and IP addresses will be used throughout the lab:
+
 |Computer Name|RDP/SSH IP|Internal Lab IP|Operating System|Connection|
 |---|:---:|---|---|---|
 |ts1.training.com|*See*|172.31.140.125|Windows Server 2016 Datacenter|RDP|
@@ -44,6 +45,7 @@ The following computer names and IP addresses will be used throughout the lab:
 
 ### Lab Credentials
 The following user names and passwords will be used throughout the lab:
+
 |Windows|Linux|Password|
 |---|---|---|
 |Training\Administrator|root|FastPower$hell19|
