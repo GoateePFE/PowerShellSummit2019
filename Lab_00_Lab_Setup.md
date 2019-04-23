@@ -38,10 +38,10 @@ You will use the **RDP/SSH IP** to connect into the remote lab virtual machines.
 The following computer names and IP addresses will be used throughout the lab:
 
 |Computer Name|RDP/SSH IP|Internal Lab IP|Operating System|Connection|
-|---|:---:|---|---|---|
-|ts1.training.com|*See*|172.31.140.125|Windows Server 2016 Datacenter|RDP|
-|client-01.training.com|*lab*|172.31.153.93|Windows 10 Enterprise|RDP|
-|client-05.training.com|*console*|172.31.143.98|Kali Linux|SSH/PuTTY|
+|---|:---:|:---:|---|---|
+|ts1.training.com|*See*|*See*|Windows Server 2016 Datacenter|RDP|
+|client-01.training.com|*lab*|*lab*|Windows 10 Enterprise|RDP|
+|client-05.training.com|*console*|*console*|Kali Linux|SSH/PuTTY|
 
 ### Lab Credentials
 The following user names and passwords will be used throughout the lab:
