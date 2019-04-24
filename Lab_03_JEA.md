@@ -36,11 +36,11 @@ You will begin by ensuring that PowerShell auditing measures are implemented on 
 
 1. RDP into the `ts1.training.com` server using the **RDP/SSH IP** from the lab web page. Use the `Training\Administrator` credential from the lab setup guide.
 
-1. For this lab we want to make sure the PowerShell policies are enabled. We will do this with a pre-configured GPO. Open an elevated PowerShell console. Run the following command and reuse the elevated session for the other commands as well:
+1. For this lab we want to make sure the PowerShell policies are enabled. We will do this with a pre-configured GPO. Open PowerShell ISE, and then open the `C:\Labs\Lab_03_JEA.ps1` file. Run the following commands by clicking once on the line and pressing `F8`:
 
     `Set-GPLink -Name 'PowerShell Security' -Target 'DC=training,DC=com' -LinkEnabled Yes`
 
-1. Now refresh GPO in the same elevated PowerShell console:
+1. Now refresh GPO:
 
     `gpupdate /force /wait:0`
 
@@ -92,17 +92,28 @@ The JEA configuration is now ready for restricted remoting sessions.
 
 1. Initially viewing the logs will be easiest with Windows Event Viewer. Then switch to PowerShell to search for specific keywords in the event logs. Pay close attention to the `Username` and `RunAs User` in the log headers. The `LabJEA-Server.ps1` script file has helpful command examples to get started. Look for evidence of remote command activity in the following locations:
 
-    - WinRM
-        - What can you find in event ID `193` in the log `Microsoft-Windows-WinRM/Operational`?
-    - Pipeline Execution Details
-        - What can you find in event ID `800` in the log `Windows PowerShell`?
-    - Module Logging
-        - What can you find in event ID `4103` in the log `Microsoft-Windows-PowerShell/Operational`?
-    - Script Block Logging
-        - What can you find in event ID `4104` in the log `Microsoft-Windows-PowerShell/Operational`?
+    - What can you find in event ID `193` in the log `Microsoft-Windows-WinRM/Operational`?
+
+        `Get-WinEvent -LogName 'Microsoft-Windows-WinRM/Operational' -FilterXPath '*[System[(EventID=193)]]' -MaxEvents 10 | Format-Table TimeCreated, Message -Wrap`
+
+    - What can you find in event ID `800` in the log `Windows PowerShell`?
+
+        `Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 100 | Format-Table TimeCreated, Message -Wrap`
+
+    - What can you find in event ID `4103` in the log `Microsoft-Windows-PowerShell/Operational`?
+
+        `Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4103)]]' -MaxEvents 100 | Format-Table TimeCreated, Message -Wrap`
+
+    - What can you find in event ID `4104` in the log `Microsoft-Windows-PowerShell/Operational`?
+
+        `Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4104)]]' -MaxEvents 100 | Format-Table TimeCreated, Message -Wrap`
+
     - Transcription
+
         - What can you find in transcript files in `C:\PSTranscriptsJEA`?
+
         - What can you find in transcript files in `C:\PSTranscripts`?
+
         - Browse and open individual transcript files to see all session activity.
 
 1. JEA in this lab uses a [virtual account](https://docs.microsoft.com/en-us/powershell/jea/session-configurations#choose-the-jea-identity). How does this look different in the logs and transcripts you identified?

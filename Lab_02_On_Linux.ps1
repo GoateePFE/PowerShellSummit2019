@@ -22,7 +22,7 @@ Get-Module
 
 Get-Command -Module PSReadLine
 
-Get-PSReadLineOption - notice the properties MaximumHistoryCount and HistorySavePath
+Get-PSReadLineOption
 
 ### 2.1.3 PowerShell policies JSON
 
@@ -122,7 +122,7 @@ cd USE_DATE_DIRECTORY_HERE
 
 ls -l
 
-nano PASTED_TXT_FILE_NAME (Use PgUp/PgDn to view the file and CTRL X to exit.)
+nano PASTED_TXT_FILE_NAME (Use PgUp/PgDn to view the file and CTRL-X to exit.)
 
 cat PASTED_TXT_FILE_NAME
 

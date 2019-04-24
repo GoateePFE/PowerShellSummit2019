@@ -17,8 +17,6 @@ If connectivity to the remote lab is not available, then the steps in Lab 01 can
 
 ## Exercise 1.1 - Stuff you get out-of-the-box with no configuration
 The following PowerShell logging techniques require no configuration:
-- Pipeline execution logging
-- Module logging
 - PSReadline command history
 - Script block logging (limited)
 - AntiMalware Scan Interface (AMSI)
@@ -27,35 +25,7 @@ We will run a PowerShell command and observe everywhere that it is logged by def
 
 ---
 
-### 1.1.1 Pipeline Execution Logging
-
-Windows 10 includes automatic logging in `Windows PowerShell` with these event IDs:
-
-`400` - PowerShell host start (ie. when you opened the blue window)
-
-`800` - These occur in pairs: the first event showing the command and the second showing the output.
-
-`403` - Session end (when the entire PowerShell host closes)
-
-1. You will use multiple PowerShell event logs in this lab. Identify them with this command:
-
-    `Get-WinEvent -ListLog *powershell*`
-
-1. Open a PowerShell prompt and type a simple command like `Get-Process` or `Get-Service`. Close the PowerShell window.
-
-1. Open up Windows Event Viewer or use PowerShell to find these events.
-
-    `Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
-
-1. Notice that there is a lot of noise in these logs. This will be true for all the logs you use in this lab. Once you identify the events with the command and output study the data fields in the message body (UserId, HostName, HostId, HostApplication, RunspaceId, etc.) These data values can be coorelated for forensic details across sessions and users.
-
-> **NOTE** - Pay close attention to the Windows Event Viewer PowerShell log locations:
->    - `Windows PowerShell`: Applications and Service Logs \ Windows PowerShell
->    - `Microsoft-Windows-PowerShell/Operational`: Applications and Service Logs \ Microsoft \ Windows \ PowerShell \ Operational
-
----
-
-### 1.1.2 PSReadline Command History
+### 1.1.1 PSReadline Command History
 
 The module PSReadline has been around for years.
 Among other things it gives users a Unix-like command line experience, including command history reuse with `CTRL + R`.
@@ -64,37 +34,37 @@ PSReadline stores command history in a file for reuse between sessions.
 This can be a forensic artifact for any commands physically typed at the console.
 It is easily bypassed.
 
-1. Open a PowerShell prompt and run the following commands:
+1. Open a PowerShell console (not ISE) and run the following commands:
 
-    `Get-Module` - notice PSReadline is pre-loaded on Windows 10
+    `Get-Module`
+    
+    Notice PSReadline is pre-loaded on Windows 10
 
     `Get-Command -Module PSReadline`
 
-    `Get-PSReadlineOption` - notice the properties `MaximumHistoryCount` and `HistorySavePath`
-
-    `Get-Content (Get-PSReadlineOption).HistorySavePath`
-
-1. Open the PowerShell ISE, run the command below in the blue window pane, then close the ISE.
-
-    `Get-PSReadlineOption` - notice the properties `MaximumHistoryCount` and `HistorySavePath`
-
-    Notice there can be a separate history file for the console and the ISE.
-
-1. Find all PSReadline history files across all user profiles:
-
-    `Get-Item C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt`
+    `Get-PSReadlineOption`
+    
+    Notice the properties `MaximumHistoryCount` and `HistorySavePath`.
 
 1. Open up a fresh PowerShell console. Now find commands you have typed in the history file:
+
+    `Get-Content (Get-PSReadlineOption).HistorySavePath`
 
     `Select-String -Path (Get-PSReadlineOption).HistorySavePath -Pattern 'module'`
 
     Replace the search term `module` with any other keyword you want to find in command history.
 
+    *This is great forensic information, but the downside is the lack of date/time stamps to know when the commands were executed.*
+
+1. Open an elevated PowerShell console and find all PSReadline history files across all user profiles:
+
+    `Get-Item C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt`
+
 1. Now search across all history files of all users on the system:
 
     `Select-String -Path C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt -Pattern 'module'`
 
-    This command is very powerful to find interactive command history across the enterprise.
+    **This command is very powerful to find interactive command history across the enterprise. Make note of it for future use.**
 
 1. Bypassing PSReadline is very easy. Type this command in your session:
 
@@ -104,7 +74,7 @@ It is easily bypassed.
 
 ---
 
-### 1.1.3 Script Block Logging (Without Policy Implementation)
+### 1.1.2 Script Block Logging (Without Policy Implementation)
 
 By default in PowerShell 5+ versions Windows will log potentially-malicious commands automatically to the log `Microsoft-Windows-PowerShell/Operational` with event ID `4104`.
 
@@ -124,7 +94,7 @@ By default in PowerShell 5+ versions Windows will log potentially-malicious comm
 
 ---
 
-### 1.1.4 AntiMalware Scan Interface (AMSI)
+### 1.1.3 AntiMalware Scan Interface (AMSI)
 
 Windows 10 and Windows Server 2016 introduced AMSI, which will scan scripts prior to execution.
 You will find these alerts in the log `Microsoft-Windows-Windows Defender/Operational` with event ID `1116` and `1117`.
@@ -150,14 +120,14 @@ You will find these alerts in the log `Microsoft-Windows-Windows Defender/Operat
 
 ## Exercise 1.2 - PowerShell Policies
 The following PowerShell logging techniques require configuration:
-- Module logging
-- Script block logging
-- System-wide transcription
+- Module logging / Pipeline Execution Logging
+- Script Block Logging
+- System-Wide Transcription
 
 We will now enable PowerShell policies for logging and transcription and study what the system captures.
 Each of the following techniques have their own nuances and capture slightly different data.
 Module Logging was introduced in PowerShell 3.0.
-Script Block Logging and system-wide Transcription were introduce in PowerShell 5.0.
+Script Block Logging and system-wide Transcription were introduced in PowerShell 5.0.
 You can manage this in the policy registry path either directly or by GPO (available in both user and computer scope).
 Bookmark the following document for deeper explanation, sample scripts, and required reading later: [PowerShell ♥ the Blue Team](https://devblogs.microsoft.com/powershell/powershell-the-blue-team/).
 
@@ -165,13 +135,21 @@ You will complete these steps from the Windows 10 client.
 
 ---
 
-### 1.2.1 Module Logging
+### 1.2.1 Module Logging / Pipeline Execution Logging
 
 This feature introduced in Windows PowerShell 3.0 allows you to track commands for select modules.
 For enteprise forensics purposes we will set this on the computer side and target *all* modules.
 More specifics are documented in [about_EventLogs](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_eventlogs?view=powershell-5.1#logging-module-events).
 
-1. Notice that modules have a property called `LogPipelineExecutionDetails` which defaults to `False`:
+1. You will use multiple PowerShell event logs in this lab. Identify them with this command:
+
+    `Get-WinEvent -ListLog *powershell*`
+
+> **NOTE** - Pay close attention to the Windows Event Viewer PowerShell log locations:
+>    - `Windows PowerShell`: Applications and Service Logs \ Windows PowerShell
+>    - `Microsoft-Windows-PowerShell/Operational`: Applications and Service Logs \ Microsoft \ Windows \ PowerShell \ Operational
+
+2. Notice that modules have a property called `LogPipelineExecutionDetails` which defaults to `False`:
 
     `Get-Module -ListAvailable | Format-Table Name, LogPipelineExecutionDetails`
 
@@ -185,11 +163,17 @@ More specifics are documented in [about_EventLogs](https://docs.microsoft.com/en
 
 1. In that same PowerShell session now run the cmdlet `Get-NetAdapter`.
 
-1. Using either Windows Event Viewer or PowerShell see if you can find the `Get-NetAdapter` command in the `Microsoft-Windows-PowerShell/Operational` log under event ID `4103`.
+1. Module logging appears in two places. PowerShell 3.0 began logging it first. Open up Windows Event Viewer or use PowerShell to see if you can find the `Get-NetAdapter` command in the `Windows PowerShell` log under event ID `800`.
+
+    `Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
+
+1. PowerShell 5.0 began logging it in a second location with a slightly different message body. Using either Windows Event Viewer or PowerShell see if you can find the `Get-NetAdapter` command in the `Microsoft-Windows-PowerShell/Operational` log under event ID `4103`.
 
     `Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4103)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
 
-1. Enable this policy using these commands in an elevated console:
+1. Notice that there is a lot of noise in these logs. This will be true for all the logs you use in this lab. Once you identify the events with the command and output study the data fields in the message body (UserId, HostName, HostId, HostApplication, RunspaceId, etc.) These data values can be correlated for forensic details across sessions and users.
+
+1. Enable this policy using these commands in an elevated PowerShell console:
 
     ```
     $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging'
@@ -203,7 +187,7 @@ More specifics are documented in [about_EventLogs](https://docs.microsoft.com/en
 
     `Get-ChildItem HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ -Recurse`
 
-1. Now you will find event ID `4103` logging for nearly any command you run. Open a new PowerShell console, try some commands, and then uses the steps above to find the events.
+1. Now you will find event ID `800` and `4103` logging for nearly any command you run. Open a *new* PowerShell console, try some commands, and then use the steps above to find the events.
 
 > **NOTE** - A PowerShell console / runspace / session will cache policies when launched. In order to see the policy take effect, you must open a fresh console.
 
@@ -224,8 +208,8 @@ For more information see [about_Logging](https://docs.microsoft.com/en-us/powers
 
     ```
     $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging'
-    New-Item $ModulePath -Force
-    New-ItemProperty $basePath -Name EnableScriptBlockLogging -Value 1 -PropertyType DWord
+    New-Item $BasePath -Force
+    New-ItemProperty $BasePath -Name EnableScriptBlockLogging -Value 1 -PropertyType DWord
     ```
 
 1. View the policy in the registry:
@@ -244,7 +228,7 @@ For more information see [about_Logging](https://docs.microsoft.com/en-us/powers
 
 ---
 
-### 1.2.3 Transcription
+### 1.2.3 System-Wide Transcription
 
 You may be familiar with the cmdlet `Start-Transcript` to record commands and output during a PowerShell session.
 Windows PowerShell 5.0 introduced nested and system-wide transcription capabilities.
@@ -262,10 +246,10 @@ See following document for recommendations: [PowerShell ♥ the Blue Team](https
 
     ```
     $BasePath   = 'HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription'
-    New-Item $ModulePath -Force
-    New-ItemProperty $basePath -Name EnableTranscripting -Value 1 -PropertyType DWord
-    New-ItemProperty $basePath -Name OutputDirectory -Value 'C:\PSTranscripts' -PropertyType String
-    New-ItemProperty $basePath -Name EnableInvocationHeader -Value 1 -PropertyType DWord
+    New-Item $BasePath -Force
+    New-ItemProperty $BasePath -Name EnableTranscripting -Value 1 -PropertyType DWord
+    New-ItemProperty $BasePath -Name OutputDirectory -Value 'C:\PSTranscripts' -PropertyType String
+    New-ItemProperty $BasePath -Name EnableInvocationHeader -Value 1 -PropertyType DWord
     ```
 
 1. View the policy in the registry:
@@ -280,6 +264,11 @@ See following document for recommendations: [PowerShell ♥ the Blue Team](https
     - Observe the time stamp for each command executed.
     - How could this data help in an investigation?
 
+1. Use this command to search the transcripts for a keyword:
+
+    `Select-String -Path C:\PSTranscripts\*\* -Pattern mimikatz`
+
+    **Make note of this command for your future hunting toolkit.**
 ---
 
 ## Exercise 1.3 - Evasion Techniques
@@ -352,15 +341,30 @@ In this exercise we will apply multiple techniques to obscure a harmless command
     `powershell -enc aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g`
 
 1. Now review your PowerShell logs for traces of the encoded or obfuscated commands. Can you find them?
+
     - PSReadline command history
-    - Pipeline execution details event 800
-    - Module logging event ID 4103
+
+        `Select-String -Path C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\*.txt -Pattern 'Ovaltine'`
+
+    - Module logging event IDs 800 and 4103
+
+        `Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
+
+        `Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4103)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
+
     - Script block logging event ID 4104
+
+        `Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -FilterXPath '*[System[(EventID=4104)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
+
     - Transcription logs
+
+        `Select-String -Path C:\PSTranscripts\*\* -Pattern 'Ovaltine'`
+
+1. **For homework later:** Combine the lines from the step above into your own parameterized script or function.
 
 > **NOTE** - If you see encoded commands in your logs, try the following syntax to decode them:
 
-    `[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g"))`
+`[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g"))`
 
 ---
 

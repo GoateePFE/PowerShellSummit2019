@@ -34,14 +34,14 @@ Begin by reviewing and implementing the logging settings available in PowerShell
 
 1. Use the **RDP/SSH IP** of the `client-05.training.com` lab machine to connect via SSH using your tool of choice (PuTTY, terminal, etc.).
     - Using terminal:
-        - `ssh user@123.234.66.78` (use the **RDP/SSH IP** from your lab web page)
+        - `ssh user@1.2.3.4` (use the **RDP/SSH IP** from your lab web page)
         - Enter the password from the lab guide.
     - Using PuTTY on Windows:
         - Install PuTTY from [putty.org]().
         - Launch PuTTY.
         - Paste the IP in the appropriate box. Click the `Open` button.
             - If using PuTTY from your local machine, then use the **RDP/SSH IP**.
-            - If using PuTTY from the Windows 10 lab VM, then use the **Internal IP**.
+            - If using PuTTY from the Windows 10 lab VM, then use the hostname **client-05**.
         - If prompted to trust the host click `Yes`.
         - Login as `user` with the password from the lab guide.
 
@@ -67,7 +67,9 @@ PSReadLine command history is a free source of logging information that does not
 
     `Get-Command -Module PSReadLine`
 
-    `Get-PSReadLineOption` - notice the properties `MaximumHistoryCount` and `HistorySavePath`
+    Notice the properties `MaximumHistoryCount` and `HistorySavePath`:
+
+    `Get-PSReadLineOption`
 
 > **NOTE** - As on Windows PowerShell it is easy to evade this by unloading the module: `Remove-Module PSReadLine`.
 
@@ -75,7 +77,7 @@ PSReadLine command history is a free source of logging information that does not
 
 ### 2.1.3 PowerShell policies JSON
 
-1. Open this help topic in your browser [about_Logging_Non-Windows](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_non-windows?view=powershell-6#configuring-logging-on-non-windows-system) and skim the section `Configuring Logging on non-Windows system`.
+1. Open this help topic in your local web browser [about_Logging_Non-Windows](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_non-windows?view=powershell-6#configuring-logging-on-non-windows-system) and skim the section `Configuring Logging on non-Windows system`.
 
 1. Review the sample JSON settings file in the documentation.
 
@@ -178,7 +180,7 @@ PSReadLine command history is a free source of logging information that does not
 
     `/home/user/.local/share/powershell/PSReadLine/ConsoleHost_history.txt`
 
-1. ***In order to avoid further polluting the PowerShell logs with commands and output hunting for activity, we will use native Linux commands to view the PowerShell activity.*** Exit the PowerShell Core session:
+1. ***In order to avoid further polluting the PowerShell logs with commands and output hunting for activity, we will use native Linux commands to view the PowerShell activity.*** Exit the PowerShell Core session and return to the Linux shell:
 
     `exit`
 
@@ -227,7 +229,7 @@ PSReadLine command history is a free source of logging information that does not
 
 1. In the PowerShell session type `exit` twice to leave PowerShell and leave the remote SSH session.
 
-1. In the `tail` command window press `CTRL C` to quit the `tail` command. Leave this SSH session open for the next exercise.
+1. In the `tail` command window press `CTRL-C` to quit the `tail` command. Leave this SSH session open for the next exercise.
 
 1. Bonus: Follow the steps [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_non-windows?view=powershell-6#filtering-powershell-log-entries-using-rsyslog) to create a dedicated rsyslog for PowerShell events.
 
@@ -249,7 +251,7 @@ PSReadLine command history is a free source of logging information that does not
 
 1. View the files. Copy and paste one of the transcript file names into one of the following commands:
 
-    `nano PASTED_TXT_FILE_NAME` (Use `PgUp`/`PgDn` to view the file and `CTRL X` to exit.)
+    `nano PASTED_TXT_FILE_NAME` (Use `PgUp`/`PgDn` to view the file and `CTRL-X` to exit.)
 
     `cat PASTED_TXT_FILE_NAME`
 
