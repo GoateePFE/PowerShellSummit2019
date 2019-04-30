@@ -163,6 +163,8 @@ More specifics are documented in [about_EventLogs](https://docs.microsoft.com/en
 
 1. In that same PowerShell session now run the cmdlet `Get-NetAdapter`.
 
+> **NOTE** - If you repeat the `Get-Module -ListAvailable` command above, remove the parameter `-ListAvailable`.
+
 1. Module logging appears in two places. PowerShell 3.0 began logging it first. Open up Windows Event Viewer or use PowerShell to see if you can find the `Get-NetAdapter` command in the `Windows PowerShell` log under event ID `800`.
 
     `Get-WinEvent -LogName 'Windows PowerShell' -FilterXPath '*[System[(EventID=800)]]' -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`

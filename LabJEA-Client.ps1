@@ -29,10 +29,10 @@ Exit
 # Disks
 Enter-PSSession -ComputerName ts1 -ConfigurationName SummitJEA -Credential $cred_alice
 
-# Shares
+# Network
 Enter-PSSession -ComputerName ts1 -ConfigurationName SummitJEA -Credential $cred_bob
 
-# Disks & Shares
+# Disks & Network
 Enter-PSSession -ComputerName ts1 -ConfigurationName SummitJEA -Credential $cred_charlie
 
 #endregion ====================================================================

