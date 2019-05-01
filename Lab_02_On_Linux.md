@@ -19,8 +19,12 @@ You will use SSH to connect.
 In the online lab web interface you must click the `View VMs` button under the **Virtual Clients** heading.
 Use the **RDP/SSH IP** of the `client-05.training.com` machine to connect.
 
-If you are are using a Windows machine, you will need an SSH client like the free utility [PuTTY](https://putty.org) or the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10) or enabled the Windows Optional Feature *OpenSSH Client* on Windows 10 1809 and above.
-If you prefer you can RDP into the `client01.training.com` Windows 10 machine where the PuTTY client is already installed.
+If you are are using a Windows machine, you will need an SSH client like one of the following:
+* the free utility [PuTTY](https://putty.org)
+* the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+* enable the Windows Optional Feature [OpenSSH Client](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on Windows 10 1809 and above
+
+If you prefer you can RDP into the public IP of the `client01.training.com` Windows 10 machine where the PuTTY client is already installed.
 MacOS or Linux clients can use SSH natively from the terminal.
 
 ---

