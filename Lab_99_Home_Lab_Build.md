@@ -20,6 +20,7 @@ Once you get the machines built, just copy over the PS1 files from this repo to 
 - An SSH client
     - [PuTTY](https://putty.org)
     - [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+    - Windows Optional Feature [OpenSSH Client](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on Windows 10 1809 and above
 - Empty local folder `C:\badness`
 
 ## Linux
