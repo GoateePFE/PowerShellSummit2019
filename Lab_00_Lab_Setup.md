@@ -27,12 +27,16 @@ If you find a typo in the lab guide, then submit a pull request. ;)
 
 **For your convenience the PowerShell commands have been saved in script files under `C:\Labs` on the two Windows lab hosts. You can open these in the ISE to run commands without copy/paste from the lab guide.**
 
-### Activating Your Lab Environment
+### Activating Your Lab Environment at PowerShell Summit 2019
 On the handout provided by your instructor you have a unique URL to your own lab instance hosted in AWS.
 Proceed to the URL and log in with the credentials provided on the sheet.
 In the middle of the screen you will see the button `View VMs` under the column title **Virtual Clients**.
 Click the `View VMs` button.
 You will use the **RDP/SSH IP** to connect into the remote lab virtual machines.
+
+### Creating a Lab Environment if you are not at PowerShell Summit 2019
+
+See [Lab_99_Home_Lab_Build.md](https://github.com/GoateePFE/PowerShellSummit2019/blob/master/Lab_99_Home_Lab_Build.md) for details on how to build the VMs to let you work through the Labs.
 
 ### Lab Machines
 The following computer names and IP addresses will be used throughout the lab:
